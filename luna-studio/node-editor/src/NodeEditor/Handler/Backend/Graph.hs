@@ -45,6 +45,7 @@ import qualified LunaStudio.Data.Error                      as ErrorAPI
 import qualified LunaStudio.Data.GraphLocation              as GraphLocation
 import qualified LunaStudio.Data.Node                       as API
 import qualified LunaStudio.Data.NodeLoc                    as NodeLoc
+import qualified NodeEditor.Action.Basic.UpdateSearcherHints as Searcher
 import qualified NodeEditor.Batch.Workspace                 as Workspace
 import qualified NodeEditor.Event.Event                     as Event
 import qualified NodeEditor.React.Model.Node.ExpressionNode as Node
@@ -63,7 +64,6 @@ import LunaStudio.Data.NodeLoc                     (NodePath, prependPath)
 import NodeEditor.Action.Basic                     (NodeUpdateModification (KeepNodeMeta, KeepPorts, MergePorts),
                                                     centerGraph, exitBreadcrumb,
                                                     localAddConnection,
-                                                    localAddSearcherHints,
                                                     localMerge,
                                                     localMoveProject,
                                                     localRemoveConnection,
@@ -469,9 +469,10 @@ handle (Event.Batch ev) = Just $ case ev of
             logError response err
             whenM (isOwnRequest requestId) $ revertRenamePort request inverse
 
-    SearchNodesResponse response -> handleResponse response success failure where
+    SearchNodesResponse response -> handle where
+        handle      = handleResponse response success failure
         request     = response ^. Response.request
-        success     = localAddSearcherHints . view SearchNodes.searcherHints
+        success     = Searcher.addDatabaseHints . view SearchNodes.searcherHints
         failure _ _ = resend request
 
     SetCodeResponse response -> handleResponse response success failure where

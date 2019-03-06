@@ -30,9 +30,10 @@ modifyApp action = do
     withApp $ continueModify action
 
 renderIfNeeded :: Command State ()
-renderIfNeeded = whenM (use $ ui . renderNeeded) $ timeIt "render" $ do
-    withApp commit
-    ui . renderNeeded .= False
+renderIfNeeded = do
+    whenM (use $ ui . renderNeeded) $ timeIt "render" $ do
+        withApp commit
+        ui . renderNeeded .= False
 
 setBreadcrumbs :: Breadcrumb (Named BreadcrumbItem) -> Command State ()
 setBreadcrumbs bc = modifyApp $ breadcrumbs .= bc
