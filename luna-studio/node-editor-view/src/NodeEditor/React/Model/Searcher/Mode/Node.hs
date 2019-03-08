@@ -2,9 +2,7 @@
 module NodeEditor.React.Model.Searcher.Mode.Node where
 
 import Common.Prelude
-import Prologue       (unsafeFromJust)
 
-import qualified Data.UUID.Types                     as UUID
 import qualified LunaStudio.Data.Searcher.Hint.Class as Class
 
 import LunaStudio.Data.NodeLoc              (NodeId, NodeLoc)
@@ -14,11 +12,9 @@ import LunaStudio.Data.Position             (Position)
 import NodeEditor.React.Model.Visualization (RunningVisualization)
 
 
-
 -----------------
 -- === New === --
 -----------------
-
 
 -- === Definition === --
 
@@ -32,11 +28,9 @@ makeLenses ''New
 instance NFData New
 
 
-
 ------------------------
 -- === Expression === --
 ------------------------
-
 
 -- === Definition === --
 
@@ -51,11 +45,9 @@ makeLenses ''Expression
 instance NFData Expression
 
 
-
 ----------------------
 -- === PortName === --
 ----------------------
-
 
 -- === Definition === --
 
@@ -68,11 +60,9 @@ makeLenses ''PortName
 instance NFData PortName
 
 
-
 ------------------
 -- === Mode === --
 ------------------
-
 
 -- === Definition === --
 
@@ -87,11 +77,9 @@ makePrisms ''Mode
 instance NFData Mode
 
 
-
 ------------------
 -- === Node === --
 ------------------
-
 
 -- === Definition === --
 
@@ -104,3 +92,9 @@ data Node = Node
 makeLenses ''Node
 
 instance NFData Node
+
+-- === API === --
+
+connectedPortRef :: Traversal' Node OutPortRef
+connectedPortRef = mode . _ExpressionMode . newNode . _Just
+                 . connectionSource . _Just

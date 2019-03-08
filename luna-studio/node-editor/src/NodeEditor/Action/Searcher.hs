@@ -27,30 +27,22 @@ import qualified Searcher.Data.Class                        as SearcherData
 import qualified Searcher.Data.Result                       as Result
 
 import Common.Action.Command                (Command)
-import Common.Debug                         (timeAction)
 import Common.Report                        (warning)
-import Control.Arrow                        ((&&&))
 import JS.Visualizers                       (registerVisualizerFrame)
 import Luna.Syntax.Text.Lexer               (evalDefLexer)
 import LunaStudio.Data.Geometry             (snap)
 import LunaStudio.Data.Matrix               (invertedTranslationMatrix,
                                              translationMatrix)
 import LunaStudio.Data.NodeLoc              (NodeLoc, NodePath)
-import LunaStudio.Data.Port                 (AnyPortId (OutPortId'))
-import LunaStudio.Data.PortRef              (AnyPortRef,
-                                             OutPortRef (OutPortRef),
-                                             toAnyPortRef)
+import LunaStudio.Data.PortRef              (OutPortRef (OutPortRef))
 import LunaStudio.Data.Position             (Position)
 import LunaStudio.Data.ScreenPosition       (move, x, y)
 import LunaStudio.Data.Size                 (height, width)
-import LunaStudio.Data.TypeRep              (TypeRep (TCons))
 import LunaStudio.Data.Vector2              (Vector2 (Vector2))
-import NodeEditor.Action.Basic              (createNode,
-                                             clearHints,
-                                             updateHints,
+import NodeEditor.Action.Basic              (clearHints, createNode,
                                              modifyCamera, renameNode,
                                              renamePort, setNodeExpression,
-                                             updateDocumentation)
+                                             updateDocumentation, updateHints)
 import NodeEditor.Action.Batch              (addImport)
 import NodeEditor.Action.State.Action       (beginActionWithKey,
                                              continueActionWithKey,
@@ -66,22 +58,14 @@ import NodeEditor.Action.State.Scene        (getScreenSize, translateToScreen,
 import NodeEditor.Action.UUID               (getUUID)
 import NodeEditor.Event.Event               (Event (Shortcut))
 import NodeEditor.React.Model.Constants     (searcherHeight, searcherWidth)
-import NodeEditor.React.Model.Visualization (RunningVisualization
-                                             (RunningVisualization),
-                                             VisualizerProperties
-                                             (VisualizerProperties),
+import NodeEditor.React.Model.Visualization (RunningVisualization (RunningVisualization),
+                                             VisualizerProperties (VisualizerProperties),
                                              getMdVisualizer)
-import NodeEditor.State.Action              (Action
-                                             (begin, continue, end, update),
+import NodeEditor.State.Action              (Action (begin, continue, end, update),
                                              Searcher (Searcher),
                                              searcherAction)
 import NodeEditor.State.Global              (State, visualizers)
 import Text.Read                            (readMaybe)
-
-import LunaStudio.Data.ScreenPosition (ScreenPosition)
-import LunaStudio.Data.Size           (Size)
-
-import NodeEditor.React.Model.Searcher.Mode (Mode)
 
 instance Action (Command State) Searcher where
     begin    = beginActionWithKey    searcherAction
@@ -94,9 +78,9 @@ unavailableDocumentationMsg
     = "Documentation unavailable. Cannot find markdown visualizer."
 
 mkDocumentationVisualization :: Command State (Maybe RunningVisualization)
-mkDocumentationVisualization = getUUID >>= \uuid -> do
+mkDocumentationVisualization = do
     mayVis <- use visualizers >>= getMdVisualizer
-    let mayVisId :: Maybe (Visualization.VisualizerId)
+    let mayVisId :: Maybe Visualization.VisualizerId
         mayVisId   = view Visualization.visualizerId <$> mayVis
         mayVisProp :: Maybe Visualization.VisualizerProperties
         mayVisProp = flip VisualizerProperties mayVisId <$> mayVis
@@ -294,7 +278,7 @@ modifyInput input selectionStart selectionEnd action = do
 handleTabPressed :: Searcher -> Command State ()
 handleTabPressed action = withJustM getSearcher $ \s ->
     if Text.null (s ^. Searcher.inputText)
-        && s ^. Searcher.selectedPosition == Nothing
+        && isNothing (s ^. Searcher.selectedPosition)
             then close action
             else void $ updateInputWithSelectedHint action
 
@@ -302,7 +286,7 @@ updateInputWithSelectedHint :: Searcher -> Command State ()
 updateInputWithSelectedHint action =
     let updateDividedInput h input = do
             let mayNextChar         = input ^? Input.suffix . ix 0
-                needsSpace c        = not $ elem c [' ', ')']
+                needsSpace c        = notElem c [' ', ')']
                 trailingSpaceNeeded = maybe True needsSpace mayNextChar
                 updatedQuery        = h ^. SearcherData.text
                     <> if trailingSpaceNeeded then " " else mempty
@@ -332,7 +316,7 @@ accept scheduleEvent action = do
                 (setNodeExpression nl inputText)
                 (\pos -> createNode (nl ^. NodeLoc.path) pos inputText False)
                 $ sd ^? NodeMode.newNode . _Just . NodeMode.position
-            nodeSearcherAccept nl (NodeMode.NodeNameMode {})
+            nodeSearcherAccept nl NodeMode.NodeNameMode {}
                 = renameNode nl inputText
             nodeSearcherAccept nl (NodeMode.PortNameMode sd)
                 = renamePort (OutPortRef nl $ sd ^. NodeMode.portId) inputText
@@ -351,8 +335,7 @@ execCommand action scheduleEvent (convert -> input) =
     let fromCommand command = do
             liftIO $ scheduleEvent $ Shortcut $ Shortcut.Event command def
             close action
-    in do
-        withJust (readMaybe input) fromCommand
+    in withJust (readMaybe input) fromCommand
 
 close :: Searcher -> Command State ()
 close _ = do

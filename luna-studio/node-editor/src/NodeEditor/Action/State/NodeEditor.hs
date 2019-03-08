@@ -17,8 +17,8 @@ import qualified NodeEditor.React.Model.NodeEditor           as NE
 import qualified NodeEditor.React.Model.Port                 as Port
 import qualified NodeEditor.React.Model.Searcher             as Searcher
 import qualified NodeEditor.React.Model.Searcher.Hint.Node   as SearcherHint
-import qualified NodeEditor.React.Model.Searcher.Mode.Node   as SearcherModeNode
 import qualified NodeEditor.React.Model.Searcher.Mode        as SearcherMode
+import qualified NodeEditor.React.Model.Searcher.Mode.Node   as SearcherModeNode
 import qualified NodeEditor.React.Model.Visualization        as Visualization
 import qualified NodeEditor.State.Global                     as Global
 
@@ -81,7 +81,6 @@ import NodeEditor.React.Model.Visualization       (ExternalVisualizers,
                                                    visualizerId, visualizerType,
                                                    _InternalVisualizer)
 import NodeEditor.State.Global                    (State, internalVisualizers,
-                                                   searcherDatabase,
                                                    preferedVisualizers,
                                                    visualizers)
 
@@ -396,9 +395,6 @@ updateVisualizers externalVisPaths = do
     modifyNodeEditor $ NE.visualizersLibPaths
         .= Visualizers internalVisPath lunaVisPath externalVisPaths
     let toMatcherMap tpe = Map.mapKeys (VisualizerId tpe) . fromJSVisualizersMap
-        externalToMatcherMap tpe fp
-            = toMatcherMap tpe <$> JS.mkProjectVisualizersMap fp
-
     internalVisMap <- liftIO
         $ fromJSInternalVisualizersMap <$> JS.mkInternalVisualizersMap
     lunaVisMap <- liftIO

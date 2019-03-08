@@ -18,7 +18,6 @@ import LunaStudio.Data.Searcher.Hint.Class (Class)
 -- === Library === --
 ---------------------
 
-
 -- === Definition === --
 
 data Library = Library
@@ -33,13 +32,12 @@ instance NFData Library
 instance ToJSON Library
 
 
-type Name              = Text
-type SearcherLibraries = Map Name Library
+type Name = Text
+type Set  = Map Name Library
 
 ------------------
 -- === Info === --
 ------------------
-
 
 -- === Definition === --
 

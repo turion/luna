@@ -9,19 +9,19 @@ module Empire.Env where
 
 import Prologue
 
-import qualified Empire.Empire  as Empire
-import qualified ZMQ.Bus.Config as Config
+import qualified Empire.Empire                         as Empire
+import qualified LunaStudio.Data.Searcher.Hint.Library as SearcherLibrary
+import qualified ZMQ.Bus.Config                        as Config
 
-import Control.Concurrent.MVar               (MVar)
-import Control.Concurrent.STM.TChan          (TChan)
-import Data.Map                              (Map)
-import Empire.Data.Graph                     (ClsGraph, CommandState (..),
-                                              Graph, defaultPMState)
-import LunaStudio.API.AsyncUpdate            (AsyncUpdate)
-import LunaStudio.Data.GraphLocation         (GraphLocation (..))
-import LunaStudio.Data.Searcher.Hint.Library (SearcherLibraries)
-import ZMQ.Bus.Config                        (Config)
-import ZMQ.Bus.Data.Message                  (Message)
+import Control.Concurrent.MVar       (MVar)
+import Control.Concurrent.STM.TChan  (TChan)
+import Data.Map                      (Map)
+import Empire.Data.Graph             (ClsGraph, CommandState (..), Graph,
+                                      defaultPMState)
+import LunaStudio.API.AsyncUpdate    (AsyncUpdate)
+import LunaStudio.Data.GraphLocation (GraphLocation (..))
+import ZMQ.Bus.Config                (Config)
+import ZMQ.Bus.Data.Message          (Message)
 
 instance Show (TChan Message) where
     show _ = "(TChan)"
@@ -38,7 +38,7 @@ makeLenses ''Env
 make :: TChan Message
      -> TChan AsyncUpdate
      -> MVar Empire.TCRequest
-     -> MVar SearcherLibraries
+     -> MVar SearcherLibrary.Set
      -> FilePath
      -> IO Env
 make toBus fromEmpire tc imps fp = do

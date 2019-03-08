@@ -1,20 +1,18 @@
+-- TODO: According to WD, this module should be removed. See here: https://github.com/luna/luna-studio/pull/1349#discussion_r266744449
 {-# LANGUAGE CPP #-}
-module Debug.Safe
-( (<!!>)
-, timeIt
-, withLevel
-) where
 
-import           Prologue hiding (print, putStrLn, printLn)
+module Debug.Safe where
 
-import           Debug.Console
+import Prologue hiding (print, printLn, putStrLn)
 
-import           Control.Concurrent
-import           Data.IORef         (IORef)
-import qualified Data.IORef         as IORef
-import           Data.Time.Clock    (diffUTCTime, getCurrentTime)
-import           System.CPUTime     (getCPUTime)
-import           System.IO.Unsafe   (unsafePerformIO)
+import qualified Data.IORef as IORef
+
+import Control.Concurrent
+import Data.IORef         (IORef)
+import Data.Time.Clock    (diffUTCTime, getCurrentTime)
+import Debug.Console
+import System.CPUTime     (getCPUTime)
+import System.IO.Unsafe   (unsafePerformIO)
 
 
 levelRef :: IORef Int
