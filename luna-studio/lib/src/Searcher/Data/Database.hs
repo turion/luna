@@ -49,3 +49,9 @@ create hints = let
 
 elems :: Database a -> [a]
 elems = Array.elems . view indexMapping
+
+size :: Database a -> Int
+size db = let
+    (left, right) = Array.bounds $ db ^. indexMapping
+    boundsSize = right - left + 1
+    in max boundsSize 0
