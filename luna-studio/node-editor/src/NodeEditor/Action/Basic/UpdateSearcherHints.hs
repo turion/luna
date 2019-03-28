@@ -70,7 +70,7 @@ addDatabaseHints libHints = do
 
 setImportedLibraries :: Set Library.Name -> Command State ()
 setImportedLibraries libs = do
-    Global.searcherDatabase . NodeHint.imported .= libs
+    Global.searcherDatabase %= NodeHint.setImportedLibraries libs
     missingLibs <- use $ Global.searcherDatabase . NodeHint.missingLibraries
     unless (null missingLibs) $
         searchNodes missingLibs
@@ -132,7 +132,7 @@ clearHints = do
 getConnectedPortRef :: Command State (Maybe OutPortRef)
 getConnectedPortRef = let
     connectedPortLens = Searcher.mode . Mode._Node . NodeMode.connectedPortRef
-    in join . fmap (preview connectedPortLens) <$> getSearcher where
+    in join . fmap (preview connectedPortLens) <$> getSearcher
 
 updateClassName :: Maybe Class.Name -> Command State ()
 updateClassName cl = do
@@ -152,12 +152,18 @@ scoreTextMatch query nsData = case Text.null query of
 
 bumpIf :: (a -> Bool) -> Double -> [Result a] -> [Result a]
 bumpIf pred amt = fmap bump where
-    bump = \result -> if pred $ result ^. Result.hint
+    bump result = if pred $ result ^. Result.hint
                       then result & Result.score +~ amt
                       else result
 
 defaultBumpAmount :: Double
 defaultBumpAmount = 1
+
+snippetBumpAmount :: Double
+snippetBumpAmount = 2
+
+importedBumpAmount :: Double
+importedBumpAmount = 0.1
 
 bumpLocalFuns :: Input.SymbolKind -> [Result NodeHint.Node]
               -> [Result NodeHint.Node]
@@ -188,17 +194,38 @@ bumpGlobalSyms Input.Argument        _         = id
 bumpGlobalSyms Input.Method          _         = bumpAllMethods
 bumpGlobalSyms Input.Operator        _         = bumpOperators
 
+bumpSnippets :: [Result NodeHint.Node] -> [Result NodeHint.Node]
+bumpSnippets = bumpIf (has $ NodeHint.kind . NodeHint._Snippet)
+                      snippetBumpAmount
+
+bumpImported :: [Result NodeHint.Node] -> [Result NodeHint.Node]
+bumpImported = bumpIf (\hint -> hint ^. NodeHint.library . Library.imported)
+                      importedBumpAmount
+
+filterSnippets :: Text -> Maybe Class.Name -> [Result NodeHint.Node]
+               -> [Result NodeHint.Node]
+filterSnippets query className = let
+    isNotSnippet = hasn't $ Result.hint . NodeHint.kind . NodeHint._Snippet
+    isSnippetForClass k =
+        k ^. Result.hint . NodeHint.kind == NodeHint.Snippet className
+    in if Text.null query
+        then filter ((||) <$> isNotSnippet <*> isSnippetForClass)
+        else filter isNotSnippet
+
 fullDbSearch :: Input.Divided -> NodeHint.Database -> NodeHint.Database
              -> Maybe Class.Name -> [Result Hint.Hint]
 fullDbSearch input localDb nsData mayClassName = let
-    query          = input ^. Input.query
-    nextSym        = input ^. Input.nextSymbolPrediction
-    scoredGlobal   = scoreTextMatch query nsData
-    scoredLocal    = scoreTextMatch query localDb
-    semanticLocal  = bumpLocalFuns  nextSym scoredLocal
-    semanticGlobal = bumpGlobalSyms nextSym mayClassName scoredGlobal
-    allHints       = semanticLocal <> semanticGlobal
-    sorted         = sortBy (comparing $ negate . view Result.score) allHints
+    query            = input ^. Input.query
+    nextSym          = input ^. Input.nextSymbolPrediction
+    scoredGlobal     = scoreTextMatch query nsData
+    scoredLocal      = scoreTextMatch query localDb
+    semanticLocal    = bumpLocalFuns  nextSym scoredLocal
+    semanticGlobal   = bumpGlobalSyms nextSym mayClassName scoredGlobal
+    filteredSnippets = filterSnippets query mayClassName semanticGlobal
+    scoredSnippets   = bumpSnippets filteredSnippets
+    scoredImports    = bumpImported scoredSnippets
+    allHints         = semanticLocal <> scoredImports
+    sorted           = sortBy (comparing $ negate . view Result.score) allHints
     in Hint.Node <<$>> sorted
 
 search :: Input.Divided -> NodeHint.Database -> NodeHint.Database
