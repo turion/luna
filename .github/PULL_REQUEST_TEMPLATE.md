@@ -1,13 +1,15 @@
 ### Pull Request Description
-
+<!--
 - Please describe the nature of your PR here, as well as the motivation for it.
 - If it fixes an open issue, please mention that issue number here. 
 - Does your PR pertain to UI, Backend, etc?
+-->
 
 ### Important Notes
-
+<!--
 - Mention important elements of the design.
 - Mention any notable changes to APIs. 
+-->
 
 ### Checklist
 
