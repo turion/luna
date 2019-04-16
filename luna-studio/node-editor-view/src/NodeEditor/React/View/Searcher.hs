@@ -145,7 +145,7 @@ highlighted_ result = go 0 highlights where
     name       = convert $ result ^. SearcherData.text
     go :: Int -> [Range] -> ReactElementM ViewEventHandler ()
     go omit [] = span_ [ "key" $= "l" ] . elemString
-                                        $ drop omit name
+               $ drop omit name
     go omit (h:rest) = do
         let start       = h ^. Match.start
             len         = h ^. Match.length

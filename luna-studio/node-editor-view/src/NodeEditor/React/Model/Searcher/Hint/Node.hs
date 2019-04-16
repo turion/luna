@@ -165,7 +165,7 @@ mkLocalFunctionsDb :: [Text] -> Database
 mkLocalFunctionsDb syms = insertSearcherLibraries libs def where
     libs    = Map.singleton localFunctionsLibraryName library
     library = Library.Library hints def def def
-    hints   = (\sym -> Hint.Raw sym mempty mempty) <$> syms
+    hints   = Hint.mk <$> syms
 
 insertSearcherLibraries :: Library.Set -> Database -> Database
 insertSearcherLibraries libs db = let

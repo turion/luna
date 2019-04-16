@@ -39,3 +39,11 @@ instance FromJSON Raw where
         doc  <- o Aeson..:  "documentation"
         tags <- o Aeson..:? "tags" Aeson..!= mempty
         pure $ Raw name doc tags
+
+-- === Construction === --
+
+mk :: Text -> Raw
+mk name = Raw name mempty mempty
+
+mkDocumented :: Text -> Text -> Raw
+mkDocumented name doc = Raw name doc mempty

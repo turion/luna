@@ -111,10 +111,9 @@ addSnippets snippets libraries = let
 
 importsToHints :: Unit.Unit -> SearcherLibrary.Library
 importsToHints (Unit.Unit definitions classes) = let
-    funToHint (name, def) = Hint.Raw
+    funToHint (name, def) = Hint.mkDocumented
         (convert name)
         (fromJust mempty $ def ^. Def.documentation)
-        mempty
     funHints   = funToHint <$> Map.toList (unwrap definitions)
     classHints = classToHints . view Def.documented <$> classes
     in SearcherLibrary.Library funHints
@@ -126,11 +125,11 @@ classToHints :: Class.Class -> SearcherClass.Class
 classToHints (Class.Class constructors methods _) = let
     getDocumentation    = fromJust mempty . view Def.documentation
     constructorsNames   = Map.keys constructors
-    constructorToHint n = Hint.Raw (convert n) mempty mempty
+    constructorToHint n = Hint.mk $ convert n
     constructorsHints   = constructorToHint <$> constructorsNames
     methods'            = filter (isPublicMethod . fst)
                         . Map.toList $ unwrap methods
-    methodToHint (n, d) = Hint.Raw (convert n) (getDocumentation d) mempty
+    methodToHint (n, d) = Hint.mkDocumented (convert n) (getDocumentation d)
     methodsHints        = methodToHint <$> methods'
     in SearcherClass.Class constructorsHints methodsHints mempty
 
