@@ -1,6 +1,9 @@
 ---
 name: Feature Request
 about: Request a new feature in Luna Studio.
+title: ''
+labels: 'Type: Enhancement'
+assignees: ''
 
 ---
 
@@ -18,4 +21,3 @@ Please ensure that you check the latest version of Luna Studio to see if your fe
 - A description of the motivation for adding this feature to Luna Studio.
 - Ideally this would include use-cases that support the feature.
 -->
-

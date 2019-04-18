@@ -1,8 +1,12 @@
 ---
 name: Bug Report
 about: Report a bug in Luna Studio.
+title: ''
+labels: 'Type: Bug'
+assignees: ''
 
 ---
+
 <!--
 Please ensure that you are running the latest version of Luna Studio before reporting the bug! It may have been fixed since.
 -->
@@ -36,4 +40,3 @@ Please list the reproduction steps for your bug. For example:
 <!--
 - Please include the output of `luna-studio --version`.
 -->
-
