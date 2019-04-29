@@ -1,0 +1,52 @@
+name:    luna-ws-connector
+version: 0.1.0.0
+license: AGPL-3
+author:  Luna Team <contact@luna-lang.org>
+
+default-extensions:
+  - NoImplicitPrelude
+  - OverloadedStrings
+  - Strict
+  - StrictData
+
+executables:
+  luna-ws-connector:
+    source-dirs: src-app
+    ghc-options: -Wall -O2 -threaded
+    main: Main.hs
+    dependencies:
+      - base
+      - bytestring
+      - either
+      - ekg
+      - luna-ws-connector
+      - m-logger
+      - mtl
+      - prologue
+      - zeromq4-haskell
+      - optparse-applicative
+      - zmq-bus
+      - zmq-bus-config
+
+library:
+  source-dirs: src
+  ghc-options: -Wall -O2 -threaded
+  dependencies:
+    - async
+    - base
+    - base64-bytestring
+    - binary
+    - bytestring
+    - either
+    - exceptions
+    - m-logger
+    - random
+    - mtl
+    - prologue
+    - text
+    - unagi-chan
+    - websockets
+    - zeromq4-haskell
+    - zmq-bus
+    - zmq-bus-config
+

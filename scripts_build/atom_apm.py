@@ -27,12 +27,12 @@ import re, tempfile
 third_party_path = ap.prep_path('../dist/third-party/')
 atom_home_path = ap.prep_path('../dist/user-config/atom')
 studio_package_name = "luna-studio"
-studio_atom_source_path = ap.prep_path("../luna-studio/atom")
+studio_atom_source_path = ap.prep_path("../frontend/atom")
 package_config_path = ap.prep_path("../config/packages")
 packages_path = atom_home_path + '/packages/'
 dist_package_folder = ap.prep_path('../dist-package')
 gui_package_path = ap.prep_path('../dist-package/gui.zip')
-studio_folder = ap.prep_path('../luna-studio/atom')
+studio_folder = ap.prep_path('../frontend/atom')
 version_file =ap.prep_path('../dist/config/version.txt')
 logo_ico =ap.prep_path('../resources/logo.ico')
 logo_png =ap.prep_path('../resources/logo.png')
