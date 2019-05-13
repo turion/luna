@@ -8,11 +8,12 @@ towards a style that is expressive while still easy to read and understand.
 
 - [Code Formatting](#code-formatting)
 - [Comments](#comments)
-    - [Documentation Comments](#documentation-comments)
-    - [Source Notes](#source-notes)
-    - [TODO Comments](#todo-comments)
-    - [Other Comment Usage](#other-comment-usage)
+  - [Documentation Comments](#documentation-comments)
+  - [Source Notes](#source-notes)
+  - [TODO Comments](#todo-comments)
+  - [Other Comment Usage](#other-comment-usage)
 - [Program Design](#program-design)
+  - [Inheritance vs. Composition](#inheritance-vs-composition)
 
 <!-- /MarkdownTOC -->
 
@@ -142,15 +143,44 @@ There are, of course, a few other situations where commenting is very useful:
   where the bug has been reported.
 
 ## Program Design
-We highly favor [composition over inheritance](https://en.wikipedia.org/wiki/Composition_over_inheritance). Inheritance is often misused and overused. Inheritance shouldn’t be used to _share code_. Although one of the advantages of inheritance is that you can put common code in the parent class, sharing code shouldn't be the reason why you use inheritance. Inheritance should be used to used to model classes that share _behavior_, not code. In most cases inheritance should be replaced by composition. For the needs of this guide, let's assume that we never use inheritance and, if you feel that inheritance would be much better fit for a particular use case, let's discuss that particular use case and describe the class of such use cases in this doc.
+In designing front-end code for Luna, we have a few principles that we tend to
+try and stick to as we have found that they produce clearer architecture and
+cleaner code.
 
-The problem with composition, however, is that it often requires a lot of bookkeeping and boilerplate to expose desired functionalities in the host object. The vast majority of languages does not provide any special mechanism allowing for minimizing the bookkeeping working with composition. That's why we ave created the `composable-mixins` library (unpublished, included in the `BaseGL` codebase), allowing for a much easier definition and management of composable objects. Please refer to `composalbe-mixins` documentation and tests for detailed description. An example, can be seen below.
+### Inheritance vs. Composition
+In almost all circumstances, Luna's TypeScript codebases tend to favour
+[composition over inheritance](https://en.wikipedia.org/wiki/Composition_over_inheritance)
+as inheritance is often misused.
+
+In these codebases, we do not use inheritance for the purpose of _sharing code_,
+and instead only use it to model the sharing of behaviour. As a result, we have
+the following rules of thumb
+
+- Always use composition instead of inheritance.
+- If you have a use-case that is made significantly clearer through use of
+  inheritance, please discuss it with Wojciech (@wdanilo). If it is decided to
+  make an exception, these will be noted here in the style guide.
+- When working with composition, make use of the `composable-mixins` library
+  (currently contained in the `BaseGL` repository) to eliminate boilerplate and
+  create clearer code.
+
+#### Composable Mixins and Avoiding Boilerplate
+One of the main issues with using composition architect code is that it can
+result in the need for a lot of bookkeeping and boilerplate to expose the
+desired functionality to the host object. This can often become quite the chore
+in languages without first-class support for composition. 
+
+As a result, we've created the `composable-mixins` library, currently located in
+the `BaseGL` repository as that library is its primary client for now. It allows
+for significantly simpler definition and management of composed objects. Please
+refer to the library's documentation for a detailed description of its 
+functionality, but an example is provided below.
 
 ```ts
-class C1 { 
+class C1 {
     private _priv_field = "c1_priv_field"
     c1_field1 : string
-    c1_func1(){return this._priv_field} 
+    c1_func1(){return this._priv_field}
     get c1_priv_field()  {return this._priv_field}
     set c1_priv_field(v) {this._priv_field = v}
     constructor(cfg:any){
@@ -160,10 +190,10 @@ class C1 {
 const c1 = {c1:C1}
 
 
-class C2 { 
+class C2 {
     private _priv_field = "c2_priv_field"
     c2_field1 : string
-    c2_func1(){return this._priv_field} 
+    c2_func1(){return this._priv_field}
     get c2_priv_field()  {return this._priv_field}
     set c2_priv_field(v) {this._priv_field = v}
     constructor(cfg:any){
@@ -175,8 +205,8 @@ const c2 = {c2:C2}
 
 class C3 extends mixed (c1,c2) {
     private _priv_field = "c3_priv_field"
-    c3_field1 : string 
-    c3_func1(){return this._priv_field} 
+    c3_field1 : string
+    c3_func1(){return this._priv_field}
     get c3_priv_field()  {return this._priv_field}
     set c3_priv_field(v) {this._priv_field = v}
     constructor(cfg:any){
@@ -190,7 +220,7 @@ const tgt = new C4(
     , c1: {id: 1}
     , c2: {id: 2}
     })
-    
+
 console.log(tgt.c1_field1)     // "c1_field1"
 console.log(tgt.c1.c1_field1)  // "c1_field1"
 console.log(tgt.c1_priv_field) // "c1_priv_field"
