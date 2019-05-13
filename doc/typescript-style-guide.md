@@ -142,4 +142,56 @@ There are, of course, a few other situations where commenting is very useful:
   where the bug has been reported.
 
 ## Program Design
-This section intentionally left blank for Wojciech to fill in.
+We highly favor [composition over inheritance](https://en.wikipedia.org/wiki/Composition_over_inheritance). Inheritance is often misused and overused. Inheritance shouldn’t be used to _share code_. Although one of the advantages of inheritance is that you can put common code in the parent class, sharing code shouldn't be the reason why you use inheritance. Inheritance should be used to used to model classes that share _behavior_, not code. In most cases inheritance should be replaced by composition. For the needs of this guide, let's assume that we never use inheritance and, if you feel that inheritance would be much better fit for a particular use case, let's discuss that particular use case and describe the class of such use cases in this doc.
+
+The problem with composition, however, is that it often requires a lot of bookkeeping and boilerplate to expose desired functionalities in the host object. The vast majority of languages does not provide any special mechanism allowing for minimizing the bookkeeping working with composition. That's why we ave created the `composable-mixins` library (unpublished, included in the `BaseGL` codebase), allowing for a much easier definition and management of composable objects. Please refer to `composalbe-mixins` documentation and tests for detailed description. An example, can be seen below.
+
+```ts
+class C1 { 
+    private _priv_field = "c1_priv_field"
+    c1_field1 : string
+    c1_func1(){return this._priv_field} 
+    get c1_priv_field()  {return this._priv_field}
+    set c1_priv_field(v) {this._priv_field = v}
+    constructor(cfg:any){
+        this.c1_field1 = `c${cfg.id}_field1`
+    }
+}
+const c1 = {c1:C1}
+
+
+class C2 { 
+    private _priv_field = "c2_priv_field"
+    c2_field1 : string
+    c2_func1(){return this._priv_field} 
+    get c2_priv_field()  {return this._priv_field}
+    set c2_priv_field(v) {this._priv_field = v}
+    constructor(cfg:any){
+        this.c2_field1 = `c${cfg.id}_field1`
+    }
+}
+const c2 = {c2:C2}
+
+
+class C3 extends mixed (c1,c2) {
+    private _priv_field = "c3_priv_field"
+    c3_field1 : string 
+    c3_func1(){return this._priv_field} 
+    get c3_priv_field()  {return this._priv_field}
+    set c3_priv_field(v) {this._priv_field = v}
+    constructor(cfg:any){
+        super(cfg)
+        this.c3_field1 = `c${cfg.id}_field1`
+    }
+}
+
+const tgt = new C4(
+    { id: 3
+    , c1: {id: 1}
+    , c2: {id: 2}
+    })
+    
+console.log(tgt.c1_field1)     // "c1_field1"
+console.log(tgt.c1.c1_field1)  // "c1_field1"
+console.log(tgt.c1_priv_field) // "c1_priv_field"
+```
