@@ -28,6 +28,18 @@ Both the prettier and eslint configurations that can be used are located in the
 root of this repository, and should be copied to all other repositories
 containing TypeScript code if it is not already there.
 
+Please note that in order to enable smooth prettier and eslint experience in the
+Visual Studio Code, you should add the following configuration to the user 
+configuration (File -> Preferences -> Settings)
+
+```json
+{
+    "editor.formatOnSave": true,
+    "eslint.provideLintTask": true,
+    "eslint.validate": ["javascript", "typescript"],
+}
+```
+
 ## Comments
 Comments are a tricky area to get right, as we have found that comments often
 expire quickly and, in absence of a way to validate them, remain incorrect for
