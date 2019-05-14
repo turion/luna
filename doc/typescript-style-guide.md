@@ -19,14 +19,14 @@ towards a style that is expressive while still easy to read and understand.
 
 ## Code Formatting
 Rather than a whole host of complicated formatting rules for TypeScript, we make
-use of [prettier](https://prettier.io/), an opinionated code formatter. All
-TypeScript code should be formatted using prettier, though the point at which
-you do this is up to you. We recommend either on-save in your editor, or using
-a precommit hook.
+use of [prettier](https://prettier.io), an opinionated code formatter, and
+[eslint](https://eslint.org). All TypeScript code should be formatted using
+prettier and checked using eslint, though the point at which you do this is up
+to you. We recommend either on-save in your editor, or using a precommit hook.
 
-The prettier configuration that can be used is located in the root of this
-repository, and should be copied to all other repositories containing TypeScript
-code if it is not already there.
+Both the prettier and eslint configurations that can be used are located in the
+root of this repository, and should be copied to all other repositories
+containing TypeScript code if it is not already there.
 
 ## Comments
 Comments are a tricky area to get right, as we have found that comments often
