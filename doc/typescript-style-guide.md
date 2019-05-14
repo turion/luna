@@ -29,8 +29,9 @@ root of this repository, and should be copied to all other repositories
 containing TypeScript code if it is not already there.
 
 Please note that in order to enable smooth prettier and eslint experience in the
-Visual Studio Code, you should add the following configuration to the user 
-configuration (File -> Preferences -> Settings)
+Visual Studio Code, you should install the `prettier` and `eslint` plugins, add 
+the following configuration to the user configuration (File -> Preferences -> 
+Settings), and restart the IDE.
 
 ```json
 {
