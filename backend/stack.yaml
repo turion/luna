@@ -38,7 +38,7 @@ packages:
 - {location: services/undo-redo}
 - {location: services/double-representation}
 - extra-dep: true
-  location: {commit: bd7a627131b92b96633fef7ab9b4517093821120, git: 'https://github.com/luna/luna.git'}
+  location: {commit: a2280cc25bb87bab3c122d02e13480280b6576e8, git: 'https://github.com/luna/luna.git'}
   subdirs:
     - core
     - syntax/text/parser
